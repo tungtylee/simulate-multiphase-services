@@ -21,3 +21,18 @@ All customers have to get a number in registration site, and then service site w
   * If it is True, it means customers can move to the next phase only when the next site has enough capacity for them.
 * capacity:
   * The capacity is the buffer size of the site.
+
+### Customer info
+
+A customer is recorded as a four element list. The elements are listed as follows.
+
+* unique id
+* enter timestamp (changed when a customer is transferred to other sites)
+* exit timestamp (changed when a customer is transferred to other sites)
+* interarrival time or process time
+
+## A first sample
+
+```bash
+python component.py
+```
