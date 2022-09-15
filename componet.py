@@ -7,17 +7,18 @@ service = {}
 
 graph = [src, registration, service]
 src["next"] = 1
-src["distr"] = [np.random.exponential, 20]
-src["blocked"] = False
+src["distr"] = [np.random.exponential, 10]
+src["blocked"] = True
+src["isblocked"] = False
 src["capacity"] = -1
 src["queue"] = []
 src["src"] = True
 
 registration["next"] = 2
-registration["distr"] = [np.random.normal, 28, 10]
+registration["distr"] = [np.random.normal, 18, 5]
 registration["blocked"] = True
 registration["isblocked"] = False
-registration["capacity"] = -1
+registration["capacity"] = 5
 registration["queue"] = []
 registration["src"] = False
 
@@ -42,7 +43,10 @@ while timestamp < maxduration:
     # generate and process
     for idx, k in enumerate(graph):
         if k["src"]:
-            if len(k["queue"]) < 1:
+            if (
+                len(k["queue"]) < 1
+                or timestamp > k["queue"][0][1] + k["queue"][0][3]
+            ):
                 maxcid = maxcid + 1
                 cid = maxcid
                 interarrtime = k["distr"][0](*k["distr"][1:])
