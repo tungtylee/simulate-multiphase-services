@@ -31,6 +31,12 @@ A customer is recorded as a four element list. The elements are listed as follow
 * exit timestamp (changed when a customer is transferred to other sites)
 * interarrival time or process time
 
+## Setup the environment
+
+```bash
+pip install -r requirements.txt
+```
+
 ## A first sample
 
 You can change the log level by modifying `simulatorlog.py`. Then, run the script `component.py`.
