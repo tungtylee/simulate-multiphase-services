@@ -33,6 +33,8 @@ A customer is recorded as a four element list. The elements are listed as follow
 
 ## A first sample
 
+You can change the log level by modifying `simulatorlog.py`. Then, run the script `component.py`.
+
 ```bash
 python component.py
 ```

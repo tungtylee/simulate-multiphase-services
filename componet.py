@@ -1,4 +1,5 @@
 import numpy as np
+from simulatorlog import print_event, print_info, print_movement, print_status
 
 src = {}
 registration = {}
@@ -31,9 +32,9 @@ service["src"] = False
 
 # customer format
 # (cid, in_time, out_time, process_time)
-cid = 0
+maxcid = 0
 timestamp = 0
-maxduration = 180 #* 3600
+maxduration = 180  # * 3600
 maxsites = len(graph)
 tlist = [0] * maxsites
 while timestamp < maxduration:
@@ -42,28 +43,32 @@ while timestamp < maxduration:
     for idx, k in enumerate(graph):
         if k["src"]:
             if len(k["queue"]) < 1:
-                cid = cid + 1
+                maxcid = maxcid + 1
+                cid = maxcid
                 interarrtime = k["distr"][0](*k["distr"][1:])
                 newtimestamp = timestamp + interarrtime
+                duration = interarrtime
                 c = [cid, timestamp, None, interarrtime]
                 k["queue"].append(c)
-                print("Generate Cus", c[0], "at", newtimestamp)
+                print_event(idx, cid, timestamp, duration)
         elif len(k["queue"]) > 0:
             if k["queue"][0][3] == None:
                 # the item to process
-                processtime = k["distr"][0](*k["distr"][1:])                
+                processtime = k["distr"][0](*k["distr"][1:])
                 k["queue"][0][3] = processtime
-                print("Site",  idx, "Process Cus", k["queue"][0][0], "using", processtime)
-    
+                cid = k["queue"][0][0]
+                duration = processtime
+                print_event(idx, cid, timestamp, duration)
+
     for idx, k in enumerate(graph):
-        if len(k["queue"])>0:
+        if len(k["queue"]) > 0:
             if k["queue"][0][2] == None:
                 k["queue"][0][2] = timestamp + k["queue"][0][3]
             tlist[idx] = k["queue"][0][2]
         else:
             tlist[idx] = maxduration
-    
-    sortedidx = [i[0] for i in sorted(enumerate(tlist), key=lambda x:x[1])]
+
+    sortedidx = [i[0] for i in sorted(enumerate(tlist), key=lambda x: x[1])]
     process_idx = None
     for idx in sortedidx:
         nextidx = graph[idx]["next"]
@@ -81,9 +86,9 @@ while timestamp < maxduration:
             process_idx = idx
             break
 
-    assert(process_idx != None)
+    assert process_idx != None
     if tlist[process_idx] >= maxduration:
-        print("[INFO] Time is up")
+        print_info("[INFO] Time is up")
         exit(0)
 
     # update the process_idx
@@ -93,13 +98,14 @@ while timestamp < maxduration:
     nextidx = graph[process_idx]["next"]
     if nextidx == None:
         # out
-        print("[{:06.2f}]".format(tlist[process_idx]), "Move Cus {} from {} to Out".format(moving_c[0], process_idx))
+        print_movement(tlist[process_idx], moving_c[0], process_idx, nextidx)
     else:
         # moving
-        print("[{:06.2f}]".format(tlist[process_idx]), "Move Cus {} from {} to {}".format(moving_c[0], process_idx, nextidx))
+        print_movement(tlist[process_idx], moving_c[0], process_idx, nextidx)
         moving_c[1] = moving_c[2]
         moving_c[2] = None
         moving_c[3] = None
         graph[nextidx]["queue"].append(moving_c)
     # update timestamp
     timestamp = tlist[process_idx]
+    print_status(timestamp, graph)
