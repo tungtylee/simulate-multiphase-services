@@ -7,7 +7,7 @@ service = {}
 
 graph = [src, registration, service]
 src["next"] = 1
-src["distr"] = [np.random.exponential, 10]
+src["distr"] = [np.random.exponential, 6]
 src["blocked"] = True
 src["isblocked"] = False
 src["capacity"] = -1
@@ -79,7 +79,7 @@ while timestamp < maxduration:
         if graph[idx]["blocked"]:
             if graph[nextidx]["capacity"] == len(graph[nextidx]["queue"]):
                 graph[idx]["isblocked"] = True
-                print("[INFO] Site", idx, "BLOCKED")
+                print_info(f"[INFO] Site {idx} BLOCKED")
                 graph[idx]["queue"][0][2] = None
                 continue
             else:
