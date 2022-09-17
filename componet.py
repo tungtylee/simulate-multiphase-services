@@ -10,7 +10,7 @@ src["next"] = 1
 src["distr"] = [np.random.exponential, 6]
 src["blocked"] = True
 src["isblocked"] = False
-src["capacity"] = -1
+src["capacity"] = 2  # generation is suppressed if not equal to -1
 src["queue"] = []
 src["src"] = True
 
@@ -43,7 +43,9 @@ while timestamp < maxduration:
     # generate and process
     for idx, k in enumerate(graph):
         if k["src"]:
-            if (
+            if len(k["queue"]) == k["capacity"]:
+                print_info(f"[INFO] Site {idx} BLOCKED")
+            elif (
                 len(k["queue"]) < 1
                 or timestamp > k["queue"][0][1] + k["queue"][0][3]
             ):
