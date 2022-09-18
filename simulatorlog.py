@@ -30,3 +30,23 @@ def print_movement(timestamp, cid, process_idx, nextidx):
 def print_info(info):
     if LOG_INFO:
         print(info)
+
+
+def gen_table(table, timestamp, graph):
+    maxsite = len(graph)
+    for idx, k in enumerate(graph):
+        for c in k["queue"]:
+            cid = c[0]
+            if cid not in table:
+                t_template = [None] * maxsite * 3
+                table[cid] = t_template
+            site = idx
+            subc = c[1:4]
+            for cidx, cval in enumerate(subc):
+                if cval is not None:
+                    table[cid][site * 3 + cidx] = cval
+
+
+def print_table(table):
+    for k in sorted(table.keys()):
+        print(f"{k}: {table[k]}")

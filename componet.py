@@ -1,5 +1,6 @@
 import numpy as np
 from simulatorlog import print_event, print_info, print_movement, print_status
+from simulatorlog import gen_table, print_table
 
 src = {}
 registration = {}
@@ -29,6 +30,7 @@ service["capacity"] = 3
 service["queue"] = []
 service["src"] = False
 
+table = {}
 # Please make sure that the ordering in the graph is in topological sorting
 
 # customer format
@@ -95,13 +97,16 @@ while timestamp < maxduration:
     assert process_idx != None
     if tlist[process_idx] >= maxduration:
         print_info("[INFO] Time is up")
-        exit(0)
+        break
 
+    gen_table(table, timestamp, graph)
     # update the process_idx
     moving_c = graph[process_idx]["queue"][0]
     del graph[process_idx]["queue"][0]
     moving_c[2] = tlist[process_idx]
     nextidx = graph[process_idx]["next"]
+    gen_table(table, timestamp, graph)
+
     if nextidx == None:
         # out
         print_movement(tlist[process_idx], moving_c[0], process_idx, nextidx)
@@ -115,3 +120,7 @@ while timestamp < maxduration:
     # update timestamp
     timestamp = tlist[process_idx]
     print_status(timestamp, graph)
+
+
+###
+print_table(table)
