@@ -1,7 +1,10 @@
+import time
+
 LOG_EVENT = True
 LOG_STATUS = True
 LOG_MOVEMENT = True
 LOG_INFO = True
+vis_table = {}
 
 
 def print_event(site, item_id, starttime, duration):
@@ -14,11 +17,14 @@ def print_event(site, item_id, starttime, duration):
 def print_status(timestamp, graph):
     if LOG_STATUS:
         print(f"[{timestamp:06.2f}]")
+        all_status = ""
         for idx, k in enumerate(graph):
-            print(f"{idx}: ", end="")
+            site_status = f"{idx}: "
             for c in k["queue"]:
-                print(f" {c[0]:4d}", end="")
-            print("")
+                site_status += f" {c[0]:4d}"
+            all_status += site_status + "\n"
+        print(all_status)
+        vis_table[int(timestamp * 10)] = all_status
 
 
 def print_movement(timestamp, cid, process_idx, nextidx):
@@ -50,3 +56,46 @@ def gen_table(table, timestamp, graph):
 def print_table(table):
     for k in sorted(table.keys()):
         print(f"{k}: {table[k]}")
+    print_vis_table(vis_table)
+
+
+def print_vis_table(vis):
+    t = 0
+    ith = 0
+    tlist = list(vis.keys())
+    maxt = max(tlist) + 10
+    maxitem = len(tlist)
+    oldstatus = "\n\n\n"
+    LINE_UP = "\033[1A"
+    LINE_DOWN = "\033[1B"
+    LINE_CLEAR = "\x1b[2K"
+    while t < maxt:
+        if t == 0:
+            print(f"[{t/10:06.2f}]")
+            print(oldstatus)
+            t += 1
+        elif ith >= maxitem or t < tlist[ith]:
+            print(LINE_UP, end="")
+            print(LINE_UP, end="")
+            print(LINE_UP, end="")
+            print(LINE_UP, end="")
+            print(LINE_UP, end=LINE_CLEAR)
+            print(f"[{t/10:06.2f}]")
+            print(LINE_DOWN, end="")
+            print(LINE_DOWN, end="")
+            print(LINE_DOWN, end="")
+            print(LINE_DOWN, end="")
+            # print(oldstatus)
+            t += 1
+        else:
+            oldstatus = vis[tlist[ith]]
+            ith += 1
+            print(LINE_UP, end=LINE_CLEAR)
+            print(LINE_UP, end=LINE_CLEAR)
+            print(LINE_UP, end=LINE_CLEAR)
+            print(LINE_UP, end=LINE_CLEAR)
+            print(LINE_UP, end=LINE_CLEAR)
+            print(f"[{t/10:06.2f}]")
+            print(oldstatus)
+            t += 1
+        time.sleep(0.02)
